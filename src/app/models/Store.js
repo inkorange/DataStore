@@ -53,7 +53,8 @@ module.exports = {
 
         if(!window.store[name].data) {
             var CachedData = JSON.parse(localStorage.getItem(name));
-            window.store[name].data = CachedData;
+            //console.log('getting '+name+' form localStorage: ', CachedData);
+            window.store[name].data = CachedData ? CachedData : '';
             data = window.store[name].data;
         } else {
             data = window.store[name].data;
