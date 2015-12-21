@@ -66,10 +66,12 @@ module.exports = {
         if(typeof nameArray === 'string') {
             nameArray = nameArray.split(" ");
         }
-        nameArray.map(function(name, key) {
-            this._initStore(name);
-            window.store[name].subscriptions.push(callbackFn); // subscribing to this store.
-        }, this)
+        if(nameArray) {
+            nameArray.map(function (name, key) {
+                this._initStore(name);
+                window.store[name].subscriptions.push(callbackFn); // subscribing to this store.
+            }, this)
+        }
     },
 
     getSubscribers: function(name) {
