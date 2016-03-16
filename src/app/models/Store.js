@@ -85,6 +85,23 @@ module.exports = {
             }, this)
         }
     },
+    /*
+     allows for the removal of subscribers to a Store object
+     */
+    unSubscribe: function(nameArray, callbackFn) {
+        if(typeof nameArray === 'string') {
+            nameArray = nameArray.split(" ");
+        }
+        if(nameArray) {
+            nameArray.map(function (name) {
+                window.store[name].subscriptions.map((caller, key) => {
+                    if(caller === callbackFn) {
+                        window.store[name].subscriptions.splice(key, 1);
+                    }
+                });
+            }, this)
+        }
+    },
 
     getSubscribers: function(name) {
         return window.store[name].subscriptions;
