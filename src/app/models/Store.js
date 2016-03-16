@@ -65,7 +65,7 @@ module.exports = {
 
         if(!window.store[name].data) {
             var obj = localStorage.getItem(name);
-            var CachedData = typeof obj === 'object' ? JSON.parse(localStorage.getItem(name)) : obj;
+            var CachedData = JSON.parse(obj);
             window.store[name].data = CachedData ? CachedData : '';
             data = window.store[name].data;
         } else {
