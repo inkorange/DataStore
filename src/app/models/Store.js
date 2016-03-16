@@ -17,14 +17,16 @@ module.exports = {
     },
 
     setStore: function(name, data, dataOptions) {
+        //console.trace('I set the store: ', name, data);
         var options = {
-            persist: false
+            persist: false,
+            callback: null
         };
         Object.assign(options, dataOptions);
 
         // initializes if not already done
         this._initStore(name);
-
+        //console.log('SAVING STORE ' + name + ': ', data);
         // sets the data to the store object
         window.store[name].data = data;
 
@@ -33,7 +35,6 @@ module.exports = {
 
         // if the setter contains a persist config, it will add it to local storage
         if(options.persist) {
-            // save to LocalStorage
             localStorage.setItem(name, JSON.stringify(window.store[name].data));
         }
 
@@ -43,6 +44,17 @@ module.exports = {
                 fn(data, window.store[name].message); // executing each callback that is subscribed
             });
         }
+
+        if(options.callback && typeof options.callback === "function") {
+            options.callback.call();
+        }
+    },
+
+    updateStore: function(name, obj, dataOptions) {
+        if(window.store[name]) {
+            this.setStore(name, Object.assign(window.store[name].data, obj), dataOptions);
+        }
+        return window.store[name].data;
     },
 
     getStore: function(name) {
@@ -52,8 +64,8 @@ module.exports = {
         this._initStore(name);
 
         if(!window.store[name].data) {
-            var CachedData = JSON.parse(localStorage.getItem(name));
-            //console.log('getting '+name+' form localStorage: ', CachedData);
+            var obj = localStorage.getItem(name);
+            var CachedData = typeof obj === 'object' ? JSON.parse(localStorage.getItem(name)) : obj;
             window.store[name].data = CachedData ? CachedData : '';
             data = window.store[name].data;
         } else {
