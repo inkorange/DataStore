@@ -19,8 +19,9 @@ module.exports = {
     setStore: function(name, data, dataOptions) {
         //console.trace('I set the store: ', name, data);
         var options = {
-            persist: false,
-            callback: null
+            persist: false,     // option to use localStorage to persist data when offline
+            callback: null,     // callback to fire when the data object has been updated.
+            propogate: true     // if set to true, it will execute the subscriber chain callbacks.
         };
         Object.assign(options, dataOptions);
 
@@ -39,7 +40,7 @@ module.exports = {
         }
 
         var subscriptions = window.store[name].subscriptions ? window.store[name].subscriptions : [];
-        if(subscriptions.length > 0) {
+        if(options.propogate && subscriptions.length > 0) {
             subscriptions.forEach(function (fn) {
                 fn(data, window.store[name].message); // executing each callback that is subscribed
             });
@@ -51,9 +52,8 @@ module.exports = {
     },
 
     updateStore: function(name, obj, dataOptions) {
-        if(window.store[name]) {
-            this.setStore(name, Object.assign(window.store[name].data, obj), dataOptions);
-        }
+        this._initStore(name);
+        this.setStore(name, Object.assign(window.store[name].data, obj), dataOptions);
         return window.store[name].data;
     },
 
@@ -94,11 +94,13 @@ module.exports = {
         }
         if(nameArray) {
             nameArray.map(function (name) {
-                window.store[name].subscriptions.map((caller, key) => {
-                    if(caller === callbackFn) {
-                        window.store[name].subscriptions.splice(key, 1);
-                    }
-                });
+                if(window.store[name]) {
+                    window.store[name].subscriptions.map((caller, key) => {
+                        if (caller === callbackFn) {
+                            window.store[name].subscriptions.splice(key, 1);
+                        }
+                    });
+                }
             }, this)
         }
     },
