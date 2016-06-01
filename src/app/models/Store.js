@@ -10,8 +10,8 @@ module.exports = {
         }
         if(!window.store[name]) {
             window.store[name] = {};
-            window.store[name].data = null;
-            window.store[name].message = null;
+            window.store[name].data = "";
+            window.store[name].message = "";
             window.store[name].subscriptions = [];
         }
     },
@@ -45,7 +45,6 @@ module.exports = {
                 fn(data, window.store[name].message); // executing each callback that is subscribed
             });
         }
-
         if(options.callback && typeof options.callback === "function") {
             options.callback.call();
         }
@@ -53,7 +52,8 @@ module.exports = {
 
     updateStore: function(name, obj, dataOptions) {
         this._initStore(name);
-        this.setStore(name, Object.assign(window.store[name].data, obj), dataOptions);
+        var existingObj = window.store[name].data === "" ? {} : window.store[name].data;
+        this.setStore(name, Object.assign(existingObj, obj), dataOptions);
         return window.store[name].data;
     },
 
