@@ -21,13 +21,20 @@ module.exports = {
         var options = {
             persist: false,     // option to use localStorage to persist data when offline
             callback: null,     // callback to fire when the data object has been updated.
-            propogate: true     // if set to true, it will execute the subscriber chain callbacks.
+            propogate: true,    // if set to true, it will execute the subscriber chain callbacks.
+            validate: false     // if marked true, will iterate through the object for offensive values
         };
         Object.assign(options, dataOptions);
 
         // initializes if not already done
         this._initStore(name);
         //console.log('SAVING STORE ' + name + ': ', data);
+
+        // validates the object values for encoding and decoding
+        if(options.validate) {
+            data = this.validateData(data);
+        }
+
         // sets the data to the store object
         window.store[name].data = data;
 
@@ -35,6 +42,8 @@ module.exports = {
         window.store[name].message = options.message ? options.message : '';
 
         // if the setter contains a persist config, it will add it to local storage
+        //console.trace('setStore: ', window.store[name].data);
+
         if(options.persist) {
             localStorage.setItem(name, JSON.stringify(window.store[name].data));
         }
@@ -48,6 +57,18 @@ module.exports = {
         if(options.callback && typeof options.callback === "function") {
             options.callback.call();
         }
+    },
+
+    validateData: function(obj) {
+        var keys = Object.keys(obj);
+        if(keys && keys.length > 0) {
+            keys.map((k) => {
+                if(obj[k] === Infinity) {
+                    obj[k] = "Infinity";
+                }
+            });
+        }
+        return obj;
     },
 
     updateStore: function(name, obj, dataOptions) {
