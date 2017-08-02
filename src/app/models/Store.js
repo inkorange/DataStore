@@ -17,18 +17,17 @@ module.exports = {
     },
 
     setStore: function(name, data, dataOptions) {
-        //console.trace('I set the store: ', name, data);
+
         var options = {
             persist: false,     // option to use localStorage to persist data when offline
             callback: null,     // callback to fire when the data object has been updated.
             propogate: true,    // if set to true, it will execute the subscriber chain callbacks.
-            validate: false     // if marked true, will iterate through the object for offensive values
+            validate: true     // if marked true, will iterate through the object for offensive values
         };
         Object.assign(options, dataOptions);
 
         // initializes if not already done
         this._initStore(name);
-        //console.log('SAVING STORE ' + name + ': ', data);
 
         // validates the object values for encoding and decoding
         if(options.validate) {
@@ -42,8 +41,6 @@ module.exports = {
         window.store[name].message = options.message ? options.message : '';
 
         // if the setter contains a persist config, it will add it to local storage
-        //console.trace('setStore: ', window.store[name].data);
-
         if(options.persist) {
             localStorage.setItem(name, JSON.stringify(window.store[name].data));
         }
@@ -105,6 +102,7 @@ module.exports = {
                 window.store[name].subscriptions.push(callbackFn); // subscribing to this store.
             }, this)
         }
+
     },
     /*
      allows for the removal of subscribers to a Store object
@@ -122,8 +120,9 @@ module.exports = {
                         }
                     });
                 }
-            }, this)
+            }, this);
         }
+
     },
 
     getSubscribers: function(name) {
